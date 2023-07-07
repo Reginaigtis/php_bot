@@ -25,14 +25,13 @@ class MyTelegramBot
         try {
             if (isset($update['message'])) {
                 $message = $update['message'];
-                self::$chatId = $message['chat']['id']; // Сохраните chat_id в поле класса
+                self::$chatId = $message['chat']['id'];
                 $text = $message['text'];
                 $responseText = 'Вы отправили следующее сообщение: ' . $text;
                 $userId = $message['from']['id'];
-                $date = date('d-m-Y');
 
                 self::$telegram->sendMessage([
-                    'chat_id' => self::$chatId, // Используйте сохраненный chat_id
+                    'chat_id' => self::$chatId,
                     'text' => $responseText,
                 ]);
 
@@ -48,14 +47,25 @@ class MyTelegramBot
         sleep(1);
     }
 
-    // Добавьте статический метод для получения текущего chat_id
+
     public static function getChatId()
     {
-        return self::$chatId;
+        $config = parse_ini_file('config.ini');
+        Database::connect($config);
+        $connection = Database::getConnection();
+
+        $query = "SELECT chatId FROM message ORDER BY id DESC LIMIT 1";
+        $result = pg_query($connection, $query);
+        $row = pg_fetch_assoc($result);
+        $chatId = end($row);
+
+        Database::closeConnection();
+
+        return $chatId;
     }
 }
 
 $config = parse_ini_file('config.ini');
 MyTelegramBot::init($config);
 MyTelegramBot::processUpdate();
-?>
+

@@ -1,47 +1,44 @@
+<?php
+use app\controllers\GetMessages;
+$getMessages = new GetMessages();
+$messages = $getMessages->displayMessages();
+?>
 <!DOCTYPE html>
 <html>
 <head>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
     <title>Все сообщения</title>
-    <style>
-        .message-container {
-            background-color: #f9f9f9;
-            border: 1px solid #ddd;
-            padding: 10px;
-            margin-bottom: 10px;
-        }
-
-        .message-container p {
-            margin: 0;
-            padding: 0;
-            line-height: 1.5;
-        }
-
-        .message-container .question {
-            font-weight: bold;
-        }
-
-        .message-container .answer {
-            margin-left: 20px;
-        }
-    </style>
 </head>
 <body>
-<form class="reply-form" method="POST" action="Messages.php">
-    <textarea name="reply" rows="3" cols="30" placeholder="Введите сообщение"></textarea>
-    <?php if (isset($update['message'])) : ?>
-        <input type="hidden" name="chat_id" value="<?php echo $update['message']['chat']['id']; ?>">
-    <?php else : ?>
-        <input type="hidden" name="chat_id" value="">
-    <?php endif; ?>
-    <button type="submit">Отправить</button>
-</form>
-<div id="messages-container">
-    <?php foreach ($messages as $messag) : ?>
-        <div class="message-container">
-            <p class="question"><strong>Вопрос:</strong> <?php echo $message['request']; ?></p>
-            <p class="answer"><strong>Ответ:</strong> <?php echo $message['response']; ?></p>
+<section class="section">
+    <div class="container">
+        <h1 class="title">Все сообщения</h1>
+
+        <form class="reply-form" method="POST" action="Messages.php">
+            <div class="field">
+                <label class="label">Введите сообщение</label>
+                <div class="control">
+                    <textarea class="textarea" name="reply" rows="3" placeholder="Введите сообщение"></textarea>
+                </div>
+            </div>
+            <div class="field">
+                <div class="control">
+                    <button class="button is-primary" type="submit">Отправить</button>
+                </div>
+            </div>
+        </form>
+
+        <div id="messages-container">
+            <?php foreach ($messages as $message) : ?>
+                <div class="message-container">
+                    <div class="box">
+                        <p class="question"><strong>Вопрос:</strong> <?php echo $message['request']; ?></p>
+                        <p class="answer"><strong>Ответ:</strong> <?php echo $message['response']; ?></p>
+                    </div>
+                </div>
+            <?php endforeach; ?>
         </div>
-    <?php endforeach; ?>
-</div>
+    </div>
+</section>
 </body>
 </html>

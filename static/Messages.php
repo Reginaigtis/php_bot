@@ -1,39 +1,59 @@
 <?php
 require_once "vendor/autoload.php";
 require_once "controllers/Database.php";
+require_once "controllers/MyTelegramBot.php";
 
 use app\controllers\Database;
+use app\controllers\GetMessages;
 use Telegram\Bot\Api;
 
-$config = parse_ini_file('config.ini');
-$telegram = new Api($config['token']);
+class Messages
+{
+    private $telegram;
+    private $telegramBot;
+    private $getMessages;
+    private $config;
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $content = file_get_contents("php://input");
-    $update = json_decode($content, true);
-    $replyText = $_POST['reply'];
+    public function __construct($config)
+    {
+        $this->config = $config;
+        $this->telegram = new Api($config['token']);
+        $this->telegramBot = new MyTelegramBot();
+        $this->getMessages = new GetMessages();
+    }
 
-    if (isset($update['message'])) {
-        $message = $update['message'];
-        $chatId = $message['chat']['id'];
-        $responseText = 'Вы отправили следующее сообщение: ' . $replyText;
-        $userId = $message['from']['id'];
-        $date = date('d-m-Y');
+    public function handle()
+    {
+        $this->telegramBot->init($this->config);
+        $this->telegramBot->processUpdate();
+        $chatId = $this->telegramBot->getChatId();
 
-        $telegram->sendMessage([
-            'chat_id' => $chatId,
-            'text' => $replyText,
-        ]);
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $replyText = $_POST['reply'];
+            $responseText = 'Вы отправили следующее сообщение: ' . $replyText;
+            $date = date('d-m-Y');
 
-        Database::connect($config);
-        $connection = Database::getConnection();
-        $query = "INSERT INTO message (request, response, userId, chatId, date) VALUES ('$replyText', '$responseText', '$userId', '$chatId', '$date')";
-        pg_query($connection, $query);
-        Database::closeConnection();
+            $this->telegram->sendMessage([
+                'chat_id' => $chatId,
+                'text' => $replyText,
+            ]);
 
-        // Перезагрузка страницы
-        header('Location: displayMessages.php');
-        exit();
+            Database::connect($this->config);
+            $connection = Database::getConnection();
+            $query = "INSERT INTO message (request, response, userId, chatId, date) VALUES ('$replyText', '$responseText', NULL, '$chatId', '$date')";
+            pg_query($connection, $query);
+            Database::closeConnection();
+        }
+    }
+
+    public function displayMessages()
+    {
+        return $this->getMessages->displayMessages();
     }
 }
-?>
+
+$config = parse_ini_file('config.ini');
+$messages = new Messages($config);
+$messages->handle();
+$display = $messages->displayMessages();
+
