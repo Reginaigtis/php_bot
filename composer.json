@@ -1,0 +1,24 @@
+{
+  "name": "regin/telegrambot",
+  "type": "project",
+  "authors": [
+    {
+      "name": "Regina Igtisamova",
+      "email": "regigtism@gmail.com"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "app\\": "./"
+    }
+  },
+  "minimum-stability": "dev",
+  "require": {
+    "psr/log": "*",
+    "ext-pdo": "*",
+    "ext-pgsql": "*",
+    "irazasyed/telegram-bot-sdk": "3.x-dev",
+    "swoolex/swoolex": "dev-master",
+    "cboden/ratchet": "dev-master"
+  }
+}
