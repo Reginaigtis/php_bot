@@ -25,22 +25,19 @@ class Messages
     public function handle()
     {
         $this->telegramBot->init($this->config);
-        $this->telegramBot->processUpdate();
         $chatId = $this->telegramBot->getChatId();
-
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $replyText = $_POST['reply'];
-            $responseText = 'Вы отправили следующее сообщение: ' . $replyText;
+        $replyText = $_POST['reply'];
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['reply'])) {
             $date = date('d-m-Y');
-
+            $quote = MyTelegramBot::getMotivationalQuote();
             $this->telegram->sendMessage([
                 'chat_id' => $chatId,
-                'text' => $replyText,
+                'text' => $quote,
             ]);
 
             Database::connect($this->config);
             $connection = Database::getConnection();
-            $query = "INSERT INTO message (request, response, userId, chatId, date) VALUES ('$replyText', '$responseText', NULL, '$chatId', '$date')";
+            $query = "INSERT INTO Message_text (request, response, chat_id, date) VALUES ('$replyText', '$quote', '$chatId', '$date')";
             pg_query($connection, $query);
             Database::closeConnection();
         }

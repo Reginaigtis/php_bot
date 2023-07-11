@@ -11,10 +11,36 @@ $messages = $getMessages->displayMessages();
 </head>
 <body>
 <section class="section">
+    <script>
+        const fileInput = document.querySelector('.file-input');
+        const fileName = document.querySelector('#file-name');
+
+        fileInput.addEventListener('change', function() {
+            fileName.textContent = this.files[0].name;
+        });
+    </script>
     <div class="container">
         <h1 class="title">Все сообщения</h1>
 
-        <form class="reply-form" method="POST" action="Messages.php">
+        <form class="reply-form" method="POST" action="Messages.php" enctype="multipart/form-data">
+
+            <div class="field">
+                <label class="label">Прикрепить файл</label>
+                <div class="file">
+                    <label class="file-label">
+                        <input class="file-input" type="file" name="attachment">
+                        <span class="file-cta">
+                <span class="file-icon">
+                    <i class="fas fa-upload"></i>
+                </span>
+                <span class="file-label">
+                    Выберите файл
+                </span>
+            </span>
+                    </label>
+                </div>
+                <p id="file-name" class="file-name"></p>
+            </div>
             <div class="field">
                 <label class="label">Введите сообщение</label>
                 <div class="control">

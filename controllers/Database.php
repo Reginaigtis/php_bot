@@ -1,8 +1,5 @@
 <?php
-
 namespace app\controllers;
-
-
 class Database
 {
     private static $connection;

@@ -11,7 +11,7 @@ class GetMessages
         Database::connect($config);
         $connection = Database::getConnection();
         $date = date('d-m-Y');
-        $query = "SELECT * FROM message WHERE date = '$date'";
+        $query = "SELECT * FROM Message_text WHERE date = '$date'";
         $result = pg_query($connection, $query);
         $messages = pg_fetch_all($result);
 
